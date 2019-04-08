@@ -384,7 +384,7 @@ def main():
                     if global_arr[i][j]==global_arr[i][j+1]:
                         adj+=1
             for j in range(0,4,1):
-                for i in range(0,s,1):
+                for i in range(0,3,1):
                     if global_arr[i][j]==global_arr[i+1][j]:
                         adj+=1
             if adj==0:
