@@ -1,99 +1,23 @@
 import pygame
 import random
 import math
+
+pygame.init()
+
+score=0
 global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-temp1_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-win=pygame.display.set_mode((655,655))
+
+win=pygame.display.set_mode((655,695))
 
 clock = pygame.time.Clock()
 
+
 pygame.display.set_caption("4X4 2048 by kulyash")
+def equalise(a,b):
+    for i in range(0,4):
+        for j in range(0,4):
+            a[i][j]=b[i][j]
 
-def hint():
-
-    global global_arr
-    temp2_arr=global_arr
-    #print("temp is",temp_arr)
-    #print(temp2_arr)   #remove
-    print("temp",temp2_arr) #rem
-    right_swipe()
-    print("temp",temp2_arr) #rem
-    a=max(map(max,global_arr))
-    print("temp",temp2_arr) #rem
-    countmax1=0
-    print("temp",temp2_arr) #rem
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
-                countmax1=10
-                print("temp",temp2_arr) #rem
-    count1=0
-    print("temp",temp2_arr) #rem
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]!=0:
-                count1+=1
-                print("temp",temp2_arr) #rem
-    count1=16-count1
-    print("temp",temp2_arr) #rem
-    global_arr = temp2_arr
-    print("orig", global_arr)           #remoes
-    left_swipe()
-    b=max(map(max,global_arr))
-    countmax2=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
-                countmax2=10
-    count2=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]!=0:
-                count2+=1
-    count2=16-count2
-    global_arr=temp2_arr
-    up_swipe()
-    c=max(map(max,global_arr))
-    countmax3=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
-                countmax3=10
-    count3=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]!=0:
-                count3+=1
-    count3=16-count3
-    global_arr=temp2_arr
-    down_swipe()
-    d=max(map(max,global_arr))
-    countmax4=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
-                countmax4=10
-    count4=0
-    for i in range(0,4,1):
-        for j in range(0,4,1):
-            if global_arr[i][j]!=0:
-                count4+=1
-    count4=16-count4
-    global_arr=temp2_arr
-
-    score = [0,0,0,0]
-    score[0]=math.log(a,2)+count1+countmax1
-    score[1]=math.log(b,2)+count2+countmax2
-    score[2]=math.log(c,2)+count3+countmax3
-    score[3]=math.log(d,2)+count4+countmax4
-    if max(score)==score[0]:
-        print("D")
-    elif max(score)==score[1]:
-        print("A")
-    elif max(score)==score[2]:
-        print("W")
-    elif max(score)==score[3]:
-        print("S")
 
 def toprint():
     global global_arr
@@ -147,11 +71,16 @@ def toprint():
             elif global_arr[j][k]==0:
                 pygame.draw.rect(win,(255,205,210),(20+k*155,20+j*155,150,150))
                 pygame.display.update()
-
+    pygame.draw.rect(win,(0,0,0),(0,655,655,40))
+    sco = str(score)
+    a = pygame.font.SysFont("arial",30)
+    text = a.render("SCORE: " + sco, 0, (255, 0, 0))
+    win.blit(text, (100, 660))
 def right_swipe():
 
+    global score
     global global_arr
-    global temp1_arr
+    temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
 
     for i in range(0,4,1):
@@ -165,24 +94,23 @@ def right_swipe():
 
     #kul=0
     if right_swipe.counter%2==0:
-        temp1_arr=global_arr
+        #temp1_arr=global_arr
         for i in range(0,4,1):
             for j in range (3,0,-1):
                 if temp_arr[i][j]==temp_arr[i][j-1]:
                     temp_arr[i][j]+=temp_arr[i][j]
+                    score+=temp_arr[i][j]
                     temp_arr[i][j-1]=0
 
         right_swipe.counter+=1
 
         #kul=0
-        for m in range(0,4,1):
-            for n in range(0,4,1):
-                if temp1_arr[m][n]!=temp_arr[m][n]:
-                    right_swipe.kul=1
+        # if temp1_arr!=temp_arr:
+        #     right_swipe.kul=1
 
-        global_arr=temp_arr
+        equalise(global_arr,temp_arr)
         right_swipe()
-    elif right_swipe.counter%2==1: #and right_swipe.kul!=0:
+    elif right_swipe.counter%2==1: #and temp1_arr!=global_arr:
     #if global_arr!=temp1_arr:
         x=random.randint(0,3)
         y=random.randint(0,3)
@@ -196,12 +124,14 @@ def right_swipe():
             global_arr[x][y]=2
         right_swipe.counter-=1
         right_swipe.kul=0
+
         #print(max(map(max,global_arr)))
 def left_swipe():
-
+    global score
     global global_arr
+    temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
-    temp1_arr=global_arr
+    #temp1_arr=global_arr
     for i in range(0,4,1):
         count=3;
         for j in range (0,4,1):
@@ -215,12 +145,13 @@ def left_swipe():
             for j in range (0,3,1):
                 if temp_arr[i][j]==temp_arr[i][j+1]:
                     temp_arr[i][j]+=temp_arr[i][j]
+                    score+=temp_arr[i][j]
                     temp_arr[i][j+1]=0
-        for m in range(0,4,1):
-            for n in range(0,4,1):
-                if temp1_arr[m][n]!=temp_arr[m][n]:
-                    left_swipe.kul=1
-        global_arr=temp_arr
+        # for m in range(0,4,1):
+        #     for n in range(0,4,1):
+        #         if temp1_arr[m][n]!=temp_arr[m][n]:
+        #             left_swipe.kul=1
+        equalise(global_arr,temp_arr)
         left_swipe.counter+=1
         left_swipe()
     else:
@@ -239,10 +170,10 @@ def left_swipe():
         left_swipe.kul=0
         #print(max(map(max,global_arr)))
 def up_swipe():
-
+    global score
     global global_arr
+    temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
-    temp1_arr=global_arr
     for j in range(0,4,1):
         count=3;
         for i in range (0,4,1):
@@ -256,12 +187,13 @@ def up_swipe():
             for i in range (0,3,1):
                 if temp_arr[i+1][j]==temp_arr[i][j]:
                     temp_arr[i][j]+=temp_arr[i][j]
+                    score+=temp_arr[i][j]
                     temp_arr[i+1][j]=0
-        for m in range(0,4,1):
-            for n in range(0,4,1):
-                if temp1_arr[m][n]!=temp_arr[m][n]:
-                    up_swipe.kul=1
-        global_arr=temp_arr
+        # for m in range(0,4,1):
+        #     for n in range(0,4,1):
+        #         if temp1_arr[m][n]!=temp_arr[m][n]:
+        #             up_swipe.kul=1
+        equalise(global_arr,temp_arr)
         up_swipe.counter+=1
         up_swipe()
     else:
@@ -281,9 +213,10 @@ def up_swipe():
         #print(max(map(max,global_arr)))
 def down_swipe():
 
+    global score
     global global_arr
+    temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
-    temp1_arr=global_arr
     for j in range(0,4,1):
         count=3;
         for i in range (3,-1,-1):
@@ -297,12 +230,13 @@ def down_swipe():
             for i in range (3,-1,-1):
                 if temp_arr[i-1][j]==temp_arr[i][j]:
                     temp_arr[i][j]+=temp_arr[i][j]
+                    score+=temp_arr[i][j]
                     temp_arr[i-1][j]=0
-        for m in range(0,4,1):
-            for n in range(0,4,1):
-                if temp1_arr[m][n]!=temp_arr[m][n]:
-                    down_swipe.kul=1
-        global_arr=temp_arr
+        # for m in range(0,4,1):
+        #     for n in range(0,4,1):
+        #         if temp1_arr[m][n]!=temp_arr[m][n]:
+        #             down_swipe.kul=1
+        equalise(global_arr,temp_arr)
         down_swipe.counter+=1
         down_swipe()
     else:
@@ -320,9 +254,221 @@ def down_swipe():
         down_swipe.counter-=1
         down_swipe.kul=0
         #print(max(map(max,global_arr)))
+def right_possible():
+    global global_arr
+    temp_arr = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    equalise(temp_arr,global_arr)
+    for i in range(0,4,1):
+        count=3;
+        for j in range (3,-1,-1):
+            if temp_arr[i][j]!=0:
+                temp_var=temp_arr[i][count]
+                temp_arr[i][count]=temp_arr[i][j]
+                temp_arr[i][j]=temp_var
+                count=count-1
+
+    if temp_arr!=global_arr:
+        return 1
+    else:
+        equals=0
+        for i in range(0,4,1):
+            for j in range(0,3,1):
+                if temp_arr[i][j]==temp_arr[i][j+1] and temp_arr[i][j]!=0:
+                    equals=1
+                    return 1
+        if equals==0:
+            return 0
+
+def left_possible():
+    global global_arr
+    temp_arr = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    equalise(temp_arr,global_arr)
+    for i in range(0,4,1):
+        count=3;
+        for j in range (0,4,1):
+            if temp_arr[i][j]!=0:
+                temp_var=temp_arr[i][3-count]
+                temp_arr[i][3-count]=temp_arr[i][j]
+                temp_arr[i][j]=temp_var
+                count=count-1
+    if temp_arr!=global_arr:
+        return 1
+    else:
+        equals=0
+        for i in range(0,4,1):
+            for j in range(0,3,1):
+                if temp_arr[i][j]==temp_arr[i][j+1] and temp_arr[i][j]!=0:
+                    equals=1
+                    return 1
+        if equals==0:
+            return 0
+
+def up_possible():
+    global global_arr
+    temp_arr = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    equalise(temp_arr,global_arr)
+    for j in range(0,4,1):
+        count=3;
+        for i in range (0,4,1):
+            if temp_arr[i][j]!=0:
+                temp_var=temp_arr[3-count][j]
+                temp_arr[3-count][j]=temp_arr[i][j]
+                temp_arr[i][j]=temp_var
+                count=count-1
+    if temp_arr!=global_arr:
+        return 1
+    else:
+        equals=0
+        for j in range(0,4,1):
+            for i in range(0,3,1):
+                if temp_arr[i][j]==temp_arr[i+1][j] and temp_arr[i][j]!=0:
+                    equals=1
+                    return 1
+        if equals==0:
+            return 0
+
+def down_possible():
+    global global_arr
+    temp_arr = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+
+    equalise(temp_arr,global_arr)
+    for j in range(0,4,1):
+        count=3;
+        for i in range (3,-1,-1):
+            if temp_arr[i][j]!=0:
+                temp_var=temp_arr[count][j]
+                temp_arr[count][j]=temp_arr[i][j]
+                temp_arr[i][j]=temp_var
+                count=count-1
+    if temp_arr!=global_arr:
+        return 1
+    else:
+        equals=0
+        for j in range(0,4,1):
+            for i in range(0,3,1):
+                if temp_arr[i][j]==temp_arr[i+1][j] and temp_arr[i][j]!=0:
+                    equals=1
+                    return 1
+        if equals==0:
+            return 0
+
+def hint():
+
+    global global_arr
+    temp2_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    equalise(temp2_arr,global_arr)
+    #print(temp2_arr)
+    score = [0,0,0,0]
+    if right_possible():
+        right_swipe()
+        #print(temp2_arr)
+        #print(global_arr)
+        a=max(map(max,global_arr))
+        countmax1=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
+                    countmax1=10
+        count1=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]!=0:
+                    count1+=1
+        count1=16-count1
+        equalise(global_arr,temp2_arr)
+        score[0]=math.log(a,2)+count1+countmax1
+                                #print(global_arr)
+    if left_possible():
+        left_swipe()
+        b=max(map(max,global_arr))
+        countmax2=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
+                    countmax2=10
+        count2=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]!=0:
+                    count2+=1
+        count2=16-count2
+        #print(temp2_arr)
+        equalise(global_arr,temp2_arr)
+        score[1]=math.log(b,2)+count2+countmax2
+    if up_possible():
+        up_swipe()
+        c=max(map(max,global_arr))
+        countmax3=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
+                    countmax3=10
+        count3=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]!=0:
+                    count3+=1
+        count3=16-count3
+        equalise(global_arr,temp2_arr)
+        score[2]=math.log(c,2)+count3+countmax3
+    if down_possible():
+        down_swipe()
+        d=max(map(max,global_arr))
+        countmax4=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
+                    countmax4=10
+        count4=0
+        for i in range(0,4,1):
+            for j in range(0,4,1):
+                if global_arr[i][j]!=0:
+                    count4+=1
+        count4=16-count4
+        equalise(global_arr,temp2_arr)
+        score[3]=math.log(d,2)+count4+countmax4
+    #print(temp2_arr)
+    #print(global_arr)
+    # score = [0,0,0,0]
+    # if right_possible():
+    #     score[0]=math.log(a,2)+count1+countmax1
+    # else:
+    #     score[0]=0
+    # if left_possible():
+    #     score[1]=math.log(b,2)+count2+countmax2
+    # else:
+    #     score[1]=0
+    # if up_possible():
+    #     score[2]=math.log(c,2)+count3+countmax3
+    # else:
+    #     score[2]=0
+    # if down_possible():
+    #     score[3]=math.log(d,2)+count4+countmax4
+    # else:
+    #     score[3]=0
+    if max(score)==score[0]:
+        print("D")
+        right_swipe()
+        toprint()
+    elif max(score)==score[1]:
+        print("A")
+        left_swipe()
+        toprint()
+    elif max(score)==score[2]:
+        print("W")
+        up_swipe()
+        toprint()
+    elif max(score)==score[3]:
+        print("S")
+        down_swipe()
+        toprint()
+
+
 def main():
     #pygame.event.pump()
+
     global global_arr
+    global score
     pygame.draw.rect(win,(255,205,210),(20,20,615,615))
     pygame.draw.rect(win,(0,0,0),(170,20,5,615))
     pygame.draw.rect(win,(0,0,0),(325,20,5,615))
@@ -330,6 +476,7 @@ def main():
     pygame.draw.rect(win,(0,0,0),(20,170,615,5))
     pygame.draw.rect(win,(0,0,0),(20,325,615,5))
     pygame.draw.rect(win,(0,0,0),(20,480,615,5))
+
     pygame.display.update()
     right_swipe.counter=0
     left_swipe.counter=0
@@ -353,25 +500,80 @@ def main():
     toprint()
     k=True
     while k:
+
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 k = False
-        #hint()
-        clock.tick(10)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    k=False
+                elif event.key == pygame.K_LEFT and left_possible():
+                    left_swipe()
+                    toprint()
+                    print(score)
+                # elif event.key == pygame.K_LEFT and not left_possible():
+                #     k=True
 
-        keys=pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            left_swipe()
-            toprint()
-        elif keys[pygame.K_RIGHT]:
-            right_swipe()
-            toprint()
-        elif keys[pygame.K_UP]:
-            up_swipe()
-            toprint()
-        elif keys[pygame.K_DOWN]:
-            down_swipe()
-            toprint()
+                elif event.key == pygame.K_RIGHT and right_possible():
+                    right_swipe()
+                    toprint()
+                    print(score)
+                # elif event.key == pygame.K_RIGHT and not right_possible():
+                #     k=True
+                elif event.key == pygame.K_UP and up_possible():
+                    up_swipe()
+                    toprint()
+                    print(score)
+                # elif event.key == pygame.K_RIGHT and not up_possible():
+                #     k=True
+                elif event.key == pygame.K_DOWN and down_possible():
+                    down_swipe()
+                    toprint()
+                    print(score)
+                elif event.key == pygame.K_h:
+                    hint()
+                # elif event.key == pygame.K_RIGHT and not down_possible():
+                #     k=True
+
+        #hint()
+        #clock.tick(10)
+
+
+
+        # keys=pygame.key.get_pressed()
+        # if keys[pygame.K_ESCAPE]:
+        #     k=False
+        # elif keys[pygame.K_LEFT]:
+        #     left_swipe()
+        #     toprint()
+        #     pygame.draw.rect(win,(0,0,0),(200,660,220,35))
+        #     pygame.display.update()
+        #     print(score)
+        # elif keys[pygame.K_RIGHT]:
+        #     right_swipe()
+        #     toprint()
+        #     pygame.draw.rect(win,(0,0,0),(200,660,220,35))
+        #     pygame.display.update()
+        #     print(score)
+        # elif keys[pygame.K_UP]:
+        #     up_swipe()
+        #     toprint()
+        #     pygame.draw.rect(win,(0,0,0),(200,660,220,35))
+        #     pygame.display.update()
+        #     print(score)
+        # elif keys[pygame.K_DOWN]:
+        #     pygame.display.update()
+        #     down_swipe()
+        #     toprint()
+        #     pygame.draw.rect(win,(0,0,0),(200,660,220,35))
+        #     pygame.display.update()
+        #     print(score)
+
+
+        #win.fill((0, 0, 0))
+
         empt=0
         for i in range(0,4,1):
             for j in range(0,4,1):
@@ -383,16 +585,45 @@ def main():
                 for j in range(0,3,1):
                     if global_arr[i][j]==global_arr[i][j+1]:
                         adj+=1
+
+                        #print("RIGHT/LEFT POSSIBLE!")
             for j in range(0,4,1):
                 for i in range(0,3,1):
                     if global_arr[i][j]==global_arr[i+1][j]:
                         adj+=1
+                        #print("UP/DOWN POSSIBLE!")
             if adj==0:
-                print("GAME OVER")
+                p12=pygame.image.load("game over.png")
+                win.blit(p12,(20,20))
+                pygame.display.update()
+                for gameover in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        k = False
+                    if gameover.type==pygame.KEYDOWN:
+                        if gameover.key==pygame.K_r:
+                            global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+                            score=0
+                            main()
+                        elif gameover.key==pygame.K_ESCAPE:
+                            k=False
+            # if keys[]
+            #     k=False
 
         if max(map(max,global_arr))==2048:
-            print("YOU WON")
-            k=False
+            p13=pygame.image.load("winner.png")
+            win.blit(p13,(20,20))
+            pygame.display.update()
+            for winner in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    k = False
+                if winner.type==pygame.KEYDOWN:
+                    if winner.key==pygame.K_r:
+                        global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+                        score=0
+                        main()
+                    elif winner.key==pygame.K_ESCAPE:
+                        k=False
+
         #print(global_arr)
 
 main()
