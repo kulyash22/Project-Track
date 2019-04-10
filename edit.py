@@ -74,8 +74,10 @@ def toprint():
     pygame.draw.rect(win,(0,0,0),(0,655,655,40))
     sco = str(score)
     a = pygame.font.SysFont("arial",30)
-    text = a.render("SCORE: " + sco, 0, (255, 0, 0))
-    win.blit(text, (100, 660))
+    with open('High_score.txt','r') as file:
+        data=file.read()
+        text = a.render("SCORE: " + sco + "   HIGH SCORE: " + data, 0, (255, 255, 255))
+        win.blit(text, (100, 660))
 def right_swipe():
 
     global score
@@ -596,6 +598,13 @@ def main():
                 p12=pygame.image.load("game over.png")
                 win.blit(p12,(20,20))
                 pygame.display.update()
+                with open('High_score.txt','r+') as file:
+                    data_str=file.read()
+                    data=int(data_str)
+                    if score>data:
+                        file.seek(0)
+                        file.write(str(score))
+
                 for gameover in pygame.event.get():
                     if event.type == pygame.QUIT:
                         k = False
