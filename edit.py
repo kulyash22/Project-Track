@@ -4,8 +4,10 @@ import math
 
 pygame.init()
 
-score=0
+pts=0
+moves=0
 global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+redo_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 
 win=pygame.display.set_mode((655,695))
 
@@ -21,6 +23,9 @@ def equalise(a,b):
 
 def toprint():
     global global_arr
+    global moves
+    global pts
+
     #pygame.display.flip()
     for j in range(0,4,1):
         for k in range(0,4,1):
@@ -72,15 +77,16 @@ def toprint():
                 pygame.draw.rect(win,(255,205,210),(20+k*155,20+j*155,150,150))
                 pygame.display.update()
     pygame.draw.rect(win,(0,0,0),(0,655,655,40))
-    sco = str(score)
-    a = pygame.font.SysFont("arial",30)
+    sco = str(pts)
+    a = pygame.font.SysFont("arial",28)
     with open('High_score.txt','r') as file:
         data=file.read()
-        text = a.render("SCORE: " + sco + "   HIGH SCORE: " + data, 0, (255, 255, 255))
-        win.blit(text, (100, 660))
+        move=str(moves)
+        text = a.render("SCORE: " + sco + "    HIGH SCORE: " + data + "   MOVES: " + move, 0, (255, 255, 255))
+        win.blit(text, (35, 650))
 def right_swipe():
 
-    global score
+    global pts
     global global_arr
     temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
@@ -101,7 +107,7 @@ def right_swipe():
             for j in range (3,0,-1):
                 if temp_arr[i][j]==temp_arr[i][j-1]:
                     temp_arr[i][j]+=temp_arr[i][j]
-                    score+=temp_arr[i][j]
+                    pts+=temp_arr[i][j]
                     temp_arr[i][j-1]=0
 
         right_swipe.counter+=1
@@ -129,7 +135,7 @@ def right_swipe():
 
         #print(max(map(max,global_arr)))
 def left_swipe():
-    global score
+    global pts
     global global_arr
     temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
@@ -147,7 +153,7 @@ def left_swipe():
             for j in range (0,3,1):
                 if temp_arr[i][j]==temp_arr[i][j+1]:
                     temp_arr[i][j]+=temp_arr[i][j]
-                    score+=temp_arr[i][j]
+                    pts+=temp_arr[i][j]
                     temp_arr[i][j+1]=0
         # for m in range(0,4,1):
         #     for n in range(0,4,1):
@@ -172,7 +178,7 @@ def left_swipe():
         left_swipe.kul=0
         #print(max(map(max,global_arr)))
 def up_swipe():
-    global score
+    global pts
     global global_arr
     temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
@@ -189,7 +195,7 @@ def up_swipe():
             for i in range (0,3,1):
                 if temp_arr[i+1][j]==temp_arr[i][j]:
                     temp_arr[i][j]+=temp_arr[i][j]
-                    score+=temp_arr[i][j]
+                    pts+=temp_arr[i][j]
                     temp_arr[i+1][j]=0
         # for m in range(0,4,1):
         #     for n in range(0,4,1):
@@ -215,7 +221,7 @@ def up_swipe():
         #print(max(map(max,global_arr)))
 def down_swipe():
 
-    global score
+    global pts
     global global_arr
     temp_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     temp_arr=global_arr
@@ -232,7 +238,7 @@ def down_swipe():
             for i in range (3,-1,-1):
                 if temp_arr[i-1][j]==temp_arr[i][j]:
                     temp_arr[i][j]+=temp_arr[i][j]
-                    score+=temp_arr[i][j]
+                    pts+=temp_arr[i][j]
                     temp_arr[i-1][j]=0
         # for m in range(0,4,1):
         #     for n in range(0,4,1):
@@ -357,6 +363,8 @@ def down_possible():
 def hint():
 
     global global_arr
+    global pts
+    temp_score=pts
     temp2_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     equalise(temp2_arr,global_arr)
     #print(temp2_arr)
@@ -371,6 +379,8 @@ def hint():
             for j in range(0,4,1):
                 if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
                     countmax1=10
+                elif global_arr[i][j]==max(map(max,global_arr)) and (i==0 or j==0 or i==3 or j==3):
+                    countmax1=5
         count1=0
         for i in range(0,4,1):
             for j in range(0,4,1):
@@ -378,8 +388,38 @@ def hint():
                     count1+=1
         count1=16-count1
         equalise(global_arr,temp2_arr)
-        score[0]=math.log(a,2)+count1+countmax1
-                                #print(global_arr)
+        pts=temp_score
+        score[0]=a/20+count1+countmax1
+        for i in range(1,3,1):
+            for j in range(1,3,1):
+                # if global_arr[i][j]==a and (global_arr[i-1][j-1]==a/2 or global_arr[i-1][j]==a/2 or global_arr[i][j-1]==a/2 or global_arr[i][j+1]==a/2 or global_arr[i+1][j+1]==a/2 or global_arr[i+1][j]==a/2 or global_arr[i-1][j+1]==a/2 or global_arr[i+1][j-1]==a/2 ):
+                #     score[0]+=10
+                if global_arr[i][j]==2 and global_arr[i-1][j]>=4 and global_arr[i][j-1]>=4 and global_arr[i][j+1]>=4 and global_arr[i+1][j]>=4:
+                    score[0]-=a/21
+                elif global_arr[i][j]==4 and global_arr[i-1][j]>=8 and global_arr[i][j-1]>=8 and global_arr[i][j+1]>=8 and global_arr[i+1][j]>=8:
+                    score[0]-=a/22
+        if a>=64:
+            temp_var1=a
+            for i in range(0,4,1):
+                for j in range(0,3,1):
+                    while a>=16:
+                        if global_arr[i][j]==a and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=2*math.log(a,2)
+                        a/=2
+                    # elif global_arr[i][j]==a/2 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/2,2)
+                    # elif global_arr[i][j]==a/4 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/4,2)
+                    # elif global_arr[i][j]==a/8 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/8,2)
+            a=temp_var1
+            for j in range(0,4,1):
+                for i in range(0,3,1):
+                    while a>=16:
+                        if global_arr[i][j]==a and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=a/20
+                        a/=2
+
     if left_possible():
         left_swipe()
         b=max(map(max,global_arr))
@@ -388,6 +428,8 @@ def hint():
             for j in range(0,4,1):
                 if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
                     countmax2=10
+                elif global_arr[i][j]==max(map(max,global_arr)) and (i==0 or j==0 or i==3 or j==3):
+                    countmax2=5
         count2=0
         for i in range(0,4,1):
             for j in range(0,4,1):
@@ -396,7 +438,38 @@ def hint():
         count2=16-count2
         #print(temp2_arr)
         equalise(global_arr,temp2_arr)
-        score[1]=math.log(b,2)+count2+countmax2
+        pts=temp_score
+        score[1]=b/20+count2+countmax2
+        if b>=64:
+            temp_var1=b
+            for i in range(0,4,1):
+                for j in range(0,3,1):
+                    while b>=16:
+                        if global_arr[i][j]==b and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=2*math.log(b,2)
+                        b/=2
+                    # elif global_arr[i][j]==a/2 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/2,2)
+                    # elif global_arr[i][j]==a/4 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/4,2)
+                    # elif global_arr[i][j]==a/8 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/8,2)
+            b=temp_var1
+            for j in range(0,4,1):
+                for i in range(0,3,1):
+                    while b>=16:
+                        if global_arr[i][j]==b and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=b/20
+                        b/=2
+
+        for i in range(1,3,1):
+            for j in range(1,3,1):
+                # if global_arr[i][j]==b and (global_arr[i-1][j-1]==b/2 or global_arr[i-1][j]==b/2 or global_arr[i][j-1]==b/2 or global_arr[i][j+1]==b/2 or global_arr[i+1][j+1]==b/2 or global_arr[i+1][j]==b/2 or global_arr[i-1][j+1]==b/2 or global_arr[i+1][j-1]==b/2 ):
+                #     score[1]+=10
+                if global_arr[i][j]==2 and global_arr[i-1][j]>=4 and global_arr[i][j-1]>=4 and global_arr[i][j+1]>=4 and global_arr[i+1][j]>=4:
+                    score[1]-=b/21
+                elif global_arr[i][j]==4 and global_arr[i-1][j]>=8 and global_arr[i][j-1]>=8 and global_arr[i][j+1]>=8 and global_arr[i+1][j]>=8:
+                    score[1]-=b/22
     if up_possible():
         up_swipe()
         c=max(map(max,global_arr))
@@ -405,6 +478,8 @@ def hint():
             for j in range(0,4,1):
                 if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
                     countmax3=10
+                elif global_arr[i][j]==max(map(max,global_arr)) and (i==0 or j==0 or i==3 or j==3):
+                    countmax3=5
         count3=0
         for i in range(0,4,1):
             for j in range(0,4,1):
@@ -412,7 +487,38 @@ def hint():
                     count3+=1
         count3=16-count3
         equalise(global_arr,temp2_arr)
-        score[2]=math.log(c,2)+count3+countmax3
+        pts=temp_score
+        score[2]=c/20+count3+countmax3
+        if c>=64:
+            temp_var1=c
+            for i in range(0,4,1):
+                for j in range(0,3,1):
+                    while c>=16:
+                        if global_arr[i][j]==c and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=2*math.log(c,2)
+                        c/=2
+                    # elif global_arr[i][j]==a/2 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/2,2)
+                    # elif global_arr[i][j]==a/4 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/4,2)
+                    # elif global_arr[i][j]==a/8 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/8,2)
+            c=temp_var1
+            for j in range(0,4,1):
+                for i in range(0,3,1):
+                    while c>=16:
+                        if global_arr[i][j]==c and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=c/20
+                        c/=2
+        for i in range(1,3,1):
+            for j in range(1,3,1):
+                # if global_arr[i][j]==c and (global_arr[i-1][j-1]==c/2 or global_arr[i-1][j]==c/2 or global_arr[i][j-1]==c/2 or global_arr[i][j+1]==c/2 or global_arr[i+1][j+1]==c/2 or global_arr[i+1][j]==c/2 or global_arr[i-1][j+1]==c/2 or global_arr[i+1][j-1]==c/2 ):
+                #     score[2]+=10
+                if global_arr[i][j]==2 and global_arr[i-1][j]>=4 and  global_arr[i][j-1]>=4 and global_arr[i][j+1]>=4 and global_arr[i+1][j]>=4:
+                    score[2]-=c/21
+                elif global_arr[i][j]==4 and global_arr[i-1][j]>=8 and  global_arr[i][j-1]>=8 and global_arr[i][j+1]>=8 and global_arr[i+1][j]>=8:
+                    score[2]-=c/22
+
     if down_possible():
         down_swipe()
         d=max(map(max,global_arr))
@@ -421,6 +527,8 @@ def hint():
             for j in range(0,4,1):
                 if global_arr[i][j]==max(map(max,global_arr)) and ((i==0 and j==0) or (i==0 and j==3) or (i==3 and j==3) or (i==3 and j==0)):
                     countmax4=10
+                elif global_arr[i][j]==max(map(max,global_arr)) and (i==0 or j==0 or i==3 or j==3):
+                    countmax4=5
         count4=0
         for i in range(0,4,1):
             for j in range(0,4,1):
@@ -428,7 +536,38 @@ def hint():
                     count4+=1
         count4=16-count4
         equalise(global_arr,temp2_arr)
-        score[3]=math.log(d,2)+count4+countmax4
+        pts=temp_score
+        score[3]=d/20+count4+countmax4
+        if d>=64:
+            temp_var1=d
+            for i in range(0,4,1):
+                for j in range(0,3,1):
+                    while d>=16:
+                        if global_arr[i][j]==d and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=2*math.log(d,2)
+                        d/=2
+                    # elif global_arr[i][j]==a/2 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/2,2)
+                    # elif global_arr[i][j]==a/4 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/4,2)
+                    # elif global_arr[i][j]==a/8 and global_arr[i][j]==global_arr[i][j+1]:
+                    #     score[0]+=2*math.log(a/8,2)
+            d=temp_var1
+            for j in range(0,4,1):
+                for i in range(0,3,1):
+                    while d>=16:
+                        if global_arr[i][j]==d and global_arr[i][j]==global_arr[i][j+1]:
+                            score[0]+=d/20
+                        d/=2
+        for i in range(1,3,1):
+            for j in range(1,3,1):
+                # if global_arr[i][j]==d and (global_arr[i-1][j-1]==d/2 or global_arr[i-1][j]==d/2 or global_arr[i][j-1]==d/2 or global_arr[i][j+1]==d/2 or global_arr[i+1][j+1]==d/2 or global_arr[i+1][j]==d/2 or global_arr[i-1][j+1]==d/2 or global_arr[i+1][j-1]==d/2 ):
+                #     score[3]+=10
+                if global_arr[i][j]==2 and global_arr[i-1][j]>=4 and global_arr[i][j-1]>=4 and global_arr[i][j+1]>=4 and global_arr[i+1][j]>=4:
+                    score[3]-=d/21
+                if global_arr[i][j]==4 and global_arr[i-1][j]>=8 and  global_arr[i][j-1]>=8 and global_arr[i][j+1]>=8 and global_arr[i+1][j]>=8:
+                    score[3]-=d/22
+
     #print(temp2_arr)
     #print(global_arr)
     # score = [0,0,0,0]
@@ -466,11 +605,12 @@ def hint():
         toprint()
 
 
+
 def main():
     #pygame.event.pump()
-
+    global moves
     global global_arr
-    global score
+    global pts
     pygame.draw.rect(win,(255,205,210),(20,20,615,615))
     pygame.draw.rect(win,(0,0,0),(170,20,5,615))
     pygame.draw.rect(win,(0,0,0),(325,20,5,615))
@@ -512,30 +652,41 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     k=False
                 elif event.key == pygame.K_LEFT and left_possible():
+                    moves+=1
+                    equalise(redo_arr,global_arr)
                     left_swipe()
                     toprint()
-                    print(score)
+                    print(pts)
                 # elif event.key == pygame.K_LEFT and not left_possible():
                 #     k=True
 
                 elif event.key == pygame.K_RIGHT and right_possible():
+                    moves+=1
+                    equalise(redo_arr,global_arr)
                     right_swipe()
                     toprint()
-                    print(score)
+                    print(pts)
                 # elif event.key == pygame.K_RIGHT and not right_possible():
                 #     k=True
                 elif event.key == pygame.K_UP and up_possible():
+                    moves+=1
+                    equalise(redo_arr,global_arr)
                     up_swipe()
                     toprint()
-                    print(score)
+                    print(pts)
                 # elif event.key == pygame.K_RIGHT and not up_possible():
                 #     k=True
                 elif event.key == pygame.K_DOWN and down_possible():
+                    moves+=1
+                    equalise(redo_arr,global_arr)
                     down_swipe()
                     toprint()
-                    print(score)
+                    print(pts)
                 elif event.key == pygame.K_h:
                     hint()
+                elif event.key == pygame.K_b:
+                    equalise(global_arr,redo_arr)
+                    toprint()
                 # elif event.key == pygame.K_RIGHT and not down_possible():
                 #     k=True
 
@@ -595,15 +746,16 @@ def main():
                         adj+=1
                         #print("UP/DOWN POSSIBLE!")
             if adj==0:
+                pygame.time.delay(3000)
                 p12=pygame.image.load("game over.png")
                 win.blit(p12,(20,20))
                 pygame.display.update()
                 with open('High_score.txt','r+') as file:
                     data_str=file.read()
                     data=int(data_str)
-                    if score>data:
+                    if pts>data:
                         file.seek(0)
-                        file.write(str(score))
+                        file.write(str(pts))
 
                 for gameover in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -611,8 +763,12 @@ def main():
                     if gameover.type==pygame.KEYDOWN:
                         if gameover.key==pygame.K_r:
                             global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-                            score=0
+                            pts=0
                             main()
+                        elif gameover.key==pygame.K_b:
+                            equalise(global_arr,redo_arr)
+                            main()
+                            toprint()
                         elif gameover.key==pygame.K_ESCAPE:
                             k=False
             # if keys[]
@@ -628,7 +784,8 @@ def main():
                 if winner.type==pygame.KEYDOWN:
                     if winner.key==pygame.K_r:
                         global_arr=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-                        score=0
+                        pts=0
+                        moves=0
                         main()
                     elif winner.key==pygame.K_ESCAPE:
                         k=False
